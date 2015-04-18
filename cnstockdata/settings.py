@@ -12,6 +12,7 @@ BOT_NAME = 'cnstockdata'
 
 SPIDER_MODULES = ['cnstockdata.spiders']
 NEWSPIDER_MODULE = 'cnstockdata.spiders'
+FEED_FORMAT = 'csv'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'cnstockdata (+http://www.yourdomain.com)'

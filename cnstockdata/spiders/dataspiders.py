@@ -8,8 +8,18 @@ class StockListSpider(scrapy.Spider):
 
     def parse(self, response):
         fulllist = response.xpath('//div[@id="quotesearch"]/ul/li/a/text()').extract()
-        for item in fulllist:
-            g = re.match(r'(.*)(\(\d+\))', item)
-            name, code = g.groups()
-            scrapy.log.msg('got item %s' %code)
+        items = []
 
+        for item in fulllist:
+            match = re.match(r'(.*)\((\d+)\)', item)
+            name, code = match.groups()
+            stockcode = StockCode(name=name, code=code)
+            items.append(stockcode)
+
+        return items
+
+class TickDataSpider(scrapy.Spider):
+    pass
+
+class FinancialDataSpider(scrapy.Spider):
+    pass
