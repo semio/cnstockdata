@@ -18,5 +18,8 @@ ITEM_PIPELINES = {
     'cnstockdata.pipelines.FinancialDataPipelie' : 300,
     }
 
+DOWNLOAD_DELAY = 0.5
+CONCURRENT_REQUESTS_PER_IP = 3
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'cnstockdata (+http://www.yourdomain.com)'

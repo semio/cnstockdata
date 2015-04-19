@@ -6,6 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 import re
+from cnstockdata.items import FinancialData
 
 class FinancialDataPipelie(object):
 
@@ -22,9 +23,10 @@ class FinancialDataPipelie(object):
              'net_profit']
 
     def process_item(self, item, spider):
-        for field in self.flist:
-            if item[field]:
-                item[field] = inspect_value(item[field])
+        if isinstance(item, FinancialData):
+            for field in self.flist:
+                if item.has_key(field):
+                    item[field] = inspect_value(item[field])
 
         return item
 
