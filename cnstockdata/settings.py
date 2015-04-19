@@ -14,5 +14,9 @@ SPIDER_MODULES = ['cnstockdata.spiders']
 NEWSPIDER_MODULE = 'cnstockdata.spiders'
 FEED_FORMAT = 'csv'
 
+ITEM_PIPELINES = {
+    'cnstockdata.pipelines.FinancialDataPipelie' : 300,
+    }
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'cnstockdata (+http://www.yourdomain.com)'
