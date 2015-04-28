@@ -4,7 +4,7 @@
 pynt task file
 """
 
-import sys, os
+import os
 from pynt import task
 import sh
 
@@ -24,11 +24,9 @@ def get_stocklist():
 @task()
 def get_fincialdata():
     '''download fincial data'''
-    import pandas as pd
+    if os.path.exists('./data/fincial.csv'):
+        os.remove('./data/fincial.csv')
 
-    from cnstockdata.items import FinancialData
-    from cnstockdata.spiders.dataspiders import FinancialDataSpider
+    cmd = sh.Command('scrapy')
+    cmd.crawl("fincialdata", "-o", "./data/fincial.csv")
 
-    stocklist = pd.read_csv('./data/stocklist.csv')
-
-    

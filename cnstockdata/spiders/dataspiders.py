@@ -1,8 +1,14 @@
-import scrapy
+"""
+Data Spiders.
+"""
+from abc import ABCMeta, abstractmethod
 from cnstockdata.items import StockCode, FinancialData
+import scrapy
 import re
 
 class StockListSpider(scrapy.Spider):
+    """download full stock list from eastmoney
+    """
     name = 'stocklist'
     start_urls = ['http://quote.eastmoney.com/stocklist.html']
 
@@ -21,31 +27,60 @@ class StockListSpider(scrapy.Spider):
 class TickDataSpider(scrapy.Spider):
     pass
 
-class FinancialDataSpider(scrapy.Spider):
-    name = 'financialdata'
+class StockDataSpider(scrapy.Spider):
+    """This is a abstract class which will download stock related data,
+       The class' init method will accept a stock or stock list to start crwaling.
+    """
+    __metaclass__ = ABCMeta
 
-    def __init__(self, stock=None, *args, **kwargs):
-        super(FinancialDataSpider, self).__init__(*args, **kwargs)
+    def __init__(self, stock=None, url_shema=None, *args, **kwargs):
+        super(StockDataSpider, self).__init__(*args, **kwargs)
 
         self.start_urls = []
-        url_sheme = "http://money.finance.sina.com.cn/corp/go.php/vFD_FinanceSummary/stockid/%s/displaytype/4.phtml"
 
         if stock:
             self.stock = stock
-            self.start_urls = [url_sheme %stock]
+            self.start_urls = [url_shema %stock]
         else:
             self.stock = []
             import csv
-            with open('./data/stocklist.csv', 'rb') as f:
+            with open('./data/stocklist.csv', 'rb') as f: #TODO: add option to choose file
                 csvstr = csv.reader(f, delimiter=',')
                 for row in csvstr:
                     if re.match(r'^[036]\d+', row[0]):
-                        self.start_urls.append(url_sheme %row[0])
+                        self.start_urls.append(url_shema %row[0])
                         self.stock.append(row[0])
 
-        if len(self.start_urls) < 1:
-            raise ValueError('no url found')
+    @abstractmethod
+    def parse(self, response):
+        pass
 
+class StockSectorSpider(StockDataSpider):
+    """download sectors related to stock/stocklist
+    """
+    name = 'stocksectors'
+
+    def __init__(self, stock=None, *args, **kwargs):
+
+        url_shema = \
+            "http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpOtherInfo/stockid/%s/menu_num/2.phtml"
+
+        super(StockSectorSpider, self).__init__(stock, url_shema, *args, **kwargs)
+
+    def parse(self, response):
+        pass
+
+class FinancialDataSpider(StockDataSpider):
+    """download financial data from sina finance.
+    """
+    name = 'financialdata'
+
+    def __init__(self, stock=None, *args, **kwargs):
+
+        url_shema = \
+            "http://money.finance.sina.com.cn/corp/go.php/vFD_FinanceSummary/stockid/%s/displaytype/4.phtml"
+
+        super(FinancialDataSpider, self).__init__(stock, url_shema, *args, **kwargs)
 
     def parse(self, response):
 
