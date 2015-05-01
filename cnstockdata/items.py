@@ -33,6 +33,13 @@ class FinancialData(scrapy.Item):
     fees,\
     net_profit = [scrapy.Field()] * 11
 
+class StockSectors(scrapy.Item):
+
+    code = scrapy.Field()
+    sector = scrapy.Field()
+    concepts = scrapy.Field()
+
+
 
 
 

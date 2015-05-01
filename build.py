@@ -30,3 +30,13 @@ def get_fincialdata():
     cmd = sh.Command('scrapy')
     cmd.crawl("fincialdata", "-o", "./data/fincial.csv")
 
+@task()
+def get_stocksectors():
+    '''download stock sectors and concepts'''
+    if os.path.exists('./data/sectors.csv'):
+        os.remove('./data/sectors.csv')
+
+    cmd = sh.Command('scrapy')
+    cmd.crawl('stocksectors', '-o', './data/sectors.csv')
+
+

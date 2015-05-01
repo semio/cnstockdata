@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Data Spiders.
 """
@@ -75,11 +74,7 @@ class StockSectorSpider(StockDataSpider):
         sector = sectortable[1]
 
         conceptalbe = response.xpath('//table[@class="comInfo1"][2]/tr/td/text()').extract()
-
-        if conceptalbe[1] == u"对不起，暂时没有相关概念板块信息":
-            concepts = ""
-        else:
-            concepts = ','.join(conceptalbe[1:])
+        concepts = ','.join(conceptalbe[1:])
 
         if isinstance(self.stock, list):
             i = self.start_urls.index(response.url)
