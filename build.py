@@ -22,13 +22,13 @@ def get_stocklist():
     cmd.crawl("stocklist", "-o", "./data/stocklist.csv")
 
 @task()
-def get_fincialdata():
+def get_financialdata():
     '''download fincial data'''
-    if os.path.exists('./data/fincial.csv'):
-        os.remove('./data/fincial.csv')
+    if os.path.exists('./data/financial.csv'):
+        os.remove('./data/financial.csv')
 
     cmd = sh.Command('scrapy')
-    cmd.crawl("fincialdata", "-o", "./data/fincial.csv")
+    cmd.crawl("financialdata", "-o", "./data/financial.csv")
 
 @task()
 def get_stocksectors():
