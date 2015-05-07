@@ -18,8 +18,10 @@ ITEM_PIPELINES = {
     'cnstockdata.pipelines.FinancialDataPipelie' : 300,
     }
 
-DOWNLOAD_DELAY = 0.5
+DOWNLOAD_DELAY = 1
 CONCURRENT_REQUESTS_PER_IP = 3
 
+LOG_LEVEL = 'INFO'
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'cnstockdata (+http://www.yourdomain.com)'
+USER_AGENT = 'cnstockdata (+https://github.com/semio/cnstockdata)'

@@ -9,13 +9,14 @@ import scrapy
 
 
 class StockCode(scrapy.Item):
+    '''stock code and it's name'''
     # define the fields for your item here like:
     # name = scrapy.Field()
     name = scrapy.Field()
     code = scrapy.Field()
 
 class FinancialData(scrapy.Item):
-
+    '''Latest financial data for stocks'''
     code = scrapy.Field()
     date = scrapy.Field()
     # 以下变量分别为
@@ -34,10 +35,16 @@ class FinancialData(scrapy.Item):
     net_profit = [scrapy.Field()] * 11
 
 class StockSectors(scrapy.Item):
-
+    '''stock code and sectors'''
     code = scrapy.Field()
     sector = scrapy.Field()
     concepts = scrapy.Field()
+
+class DailyPrices(scrapy.Item):
+    '''daily stock prices'''
+    date = scrapy.Field()
+    code, openp, highp, closep, lowp = [scrapy.Field()] * 5
+    volume, yuanvolume, pmultiplier = [scrapy.Field()] * 3
 
 
 

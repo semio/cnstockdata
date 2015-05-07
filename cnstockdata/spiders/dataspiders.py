@@ -25,9 +25,6 @@ class StockListSpider(scrapy.Spider):
 
         return items
 
-class TickDataSpider(scrapy.Spider):
-    pass
-
 class StockDataSpider(scrapy.Spider):
     """This is a abstract class which will download stock related data,
        The class' init method will accept a stock or stock list to start crwaling.
@@ -110,8 +107,7 @@ class FinancialDataSpider(StockDataSpider):
         items = []
 
         if isinstance(self.stock, list):
-            i = self.start_urls.index(response.url)
-            code = self.stock[i]
+            code = re.match(r'.*(\d{6})', response.url).groups()[0]
         else:
             code = self.stock
 
@@ -161,7 +157,56 @@ class HistoryPriceSpider(StockDataSpider):
 
         super(HistoryPriceSpider, self).__init__(stock, url_shema, *args, **kwargs)
 
+    def start_requests(self):
+        for url in self.start_urls:
+            return [scrapy.Request(url, callback=self.get_pages)]
+
+    def get_pages(self, response):
+
+        years = response.xpath('//div[@id="con02-4"]/table[1]/tr/td/form/select[1]/option/text()')\
+                        .extract()
+        #years.sort()
+        for year in years:
+            for i in range(4, 0, -1):
+                url = response.url + '?year=' + year + '&jidu=' + str(i)
+                yield scrapy.Request(url, callback=self.parse)
+
     def parse(self, response):
-        pass
 
+        rows = response.xpath('//table[@id="FundHoldSharesTable"]/tr')
+        items = []
 
+        if len(rows) == 1: # return nothing when no data found
+            return
+
+        if isinstance(self.stock, list):
+            code = re.match(r'.*(\d{6})', response.url).groups()[0]
+        else:
+            code = self.stock
+
+        for row in rows[1:]:
+            numbers = row.xpath('td/div/text()').extract()
+
+            if len(numbers) == 8:  # old pages contains all data we need with one xpath
+                date = numbers[0].strip()
+                openp,highp,closep,lowp,volume,yuanvolume,pmultiplier = numbers[1:]
+            else: # new pages we have to extract the date with another xpath
+                datetd = row.xpath('td/div/*/text()').extract()
+                date = datetd[0].strip()
+                openp,highp,closep,lowp,volume,yuanvolume,pmultiplier = numbers[2:]
+
+            item = DailyPrices(code=code,
+                               date=date,
+                               openp=openp,
+                               highp=highp,
+                               closep=closep,
+                               lowp=lowp,
+                               volume=volume,
+                               yuanvolume=yuanvolume,
+                               pmultiplier=pmultiplier)
+            items.append(item)
+
+        return items
+
+class TickDataSpider(scrapy.Spider):
+    pass
