@@ -7,6 +7,7 @@ pynt task file
 import os
 from pynt import task
 import sh
+from datetime import datetime
 
 @task()
 def cleanup():
@@ -39,4 +40,20 @@ def get_stocksectors():
     cmd = sh.Command('scrapy')
     cmd.crawl('stocksectors', '-o', './data/sectors.csv')
 
+@task()
+def get_prices():
+    '''download stock daily prices'''
+    from pandas import read_csv
 
+    stocklist = read_csv('./data/stocklist.csv', dtype={'code':str})
+    downloadstocks = [i for i in stocklist['code'] if i.startswith(('0', '3', '6'))]
+
+    cmd = sh.Command('scrapy')
+    for stock in downloadstocks:
+        if os.path.exists('./data/prices/%s.csv' %stock):
+            continue
+        else:
+            name = stocklist[stocklist['code'] == stock].name.iloc[0]
+            print '[%s]: start downloading stock %s %s' %(datetime.today(), name, stock)
+            cmd.crawl('historyprice', '-a', 'stock=%s' %stock, '-o', './data/prices/%s.csv' %stock)
+            print '[%s]: done downloading stock %s %s' %(datetime.today(), name, stock)

@@ -4,6 +4,7 @@ Data Spiders.
 """
 from abc import ABCMeta, abstractmethod
 from cnstockdata.items import *
+from scrapy.contrib.spiders import CSVFeedSpider
 import scrapy
 import re
 
@@ -24,6 +25,7 @@ class StockListSpider(scrapy.Spider):
             items.append(stockcode)
 
         return items
+
 
 class StockDataSpider(scrapy.Spider):
     """This is a abstract class which will download stock related data,
@@ -52,6 +54,7 @@ class StockDataSpider(scrapy.Spider):
     @abstractmethod
     def parse(self, response):
         pass
+
 
 class StockSectorSpider(StockDataSpider):
     """download sectors related to stock/stocklist
@@ -85,6 +88,7 @@ class StockSectorSpider(StockDataSpider):
             code = self.stock
 
         return StockSectors(code=code, sector=sector, concepts=concepts)
+
 
 class FinancialDataSpider(StockDataSpider):
     """download financial data from sina finance.
@@ -151,7 +155,6 @@ class HistoryPriceSpider(StockDataSpider):
     name = 'historyprice'
 
     def __init__(self, stock=None, *args, **kwargs):
-
         url_shema = \
             "http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml"
 
@@ -162,7 +165,6 @@ class HistoryPriceSpider(StockDataSpider):
             return [scrapy.Request(url, callback=self.get_pages)]
 
     def get_pages(self, response):
-
         years = response.xpath('//div[@id="con02-4"]/table[1]/tr/td/form/select[1]/option/text()')\
                         .extract()
         #years.sort()
@@ -172,7 +174,6 @@ class HistoryPriceSpider(StockDataSpider):
                 yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
-
         rows = response.xpath('//table[@id="FundHoldSharesTable"]/tr')
         items = []
 
@@ -208,5 +209,8 @@ class HistoryPriceSpider(StockDataSpider):
 
         return items
 
-class TickDataSpider(scrapy.Spider):
+
+class TickDataSpider(CSVFeedSpider):
+    """download tick data for specific day
+    """
     pass
