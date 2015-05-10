@@ -7,6 +7,7 @@ from cnstockdata.items import *
 from scrapy.contrib.spiders import CSVFeedSpider
 import scrapy
 import re
+from datetime import datetime
 
 class StockListSpider(scrapy.Spider):
     """download full stock list from eastmoney
@@ -169,7 +170,16 @@ class HistoryPriceSpider(StockDataSpider):
                         .extract()
         #years.sort()
         for year in years:
-            for i in range(4, 0, -1):
+            if int(year) < 1990:
+                continue
+            if int(year) == datetime.today().year:
+                lsea = {0:1,
+                        1:2,
+                        2:3,
+                        3:4}.get(datetime.today().month/4)
+            else:
+                lsea = 4
+            for i in range(lsea, 0, -1):
                 url = response.url + '?year=' + year + '&jidu=' + str(i)
                 yield scrapy.Request(url, callback=self.parse)
 
