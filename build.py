@@ -22,6 +22,28 @@ def get_stocklist():
     cmd = sh.Command("scrapy")
     cmd.crawl("stocklist", "-o", "./data/stocklist.csv")
 
+#@task('get_stocklist')
+@task()
+def get_stocklist_mongo():
+    '''save the downloaded stocklist to mongodb'''
+    from pymongo import MongoClient
+    from pandas import read_csv
+
+    client = MongoClient()
+    db = client.stock
+    stocklist = read_csv('./data/stocklist.csv', dtype={'code': str})
+    stocklist = stocklist.set_index('code')
+
+    for idx, name in stocklist.iterrows():
+        db.basicinfo.update(
+            {'_id': idx},
+            {
+                '$set': {'name': name[0]}
+            },
+            upsert=True
+        )
+
+
 @task()
 def get_financialdata():
     '''download fincial data'''
