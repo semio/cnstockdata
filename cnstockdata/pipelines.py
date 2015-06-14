@@ -5,10 +5,12 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import re
-from cnstockdata.items import FinancialData
+#TODO: add support for mangodb
 
-class FinancialDataPipelie(object):
+import re
+#from cnstockdata.items import FinancialData
+
+class FinancialDataPipeline(object):
 
     flist = ['asset_per_share',
              'earning_per_share',
@@ -23,7 +25,8 @@ class FinancialDataPipelie(object):
              'net_profit']
 
     def process_item(self, item, spider):
-        if isinstance(item, FinancialData):
+        #if isinstance(item, FinancialData):
+        if spider.name == 'financialdata':
             for field in self.flist:
                 if item.has_key(field):
                     item[field] = inspect_value(item[field])
@@ -43,5 +46,3 @@ def inspect_value(s):
         return 0
     else:
         return float(s)
-
-

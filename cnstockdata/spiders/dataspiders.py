@@ -16,6 +16,7 @@ class StockListSpider(scrapy.Spider):
     start_urls = ['http://quote.eastmoney.com/stocklist.html']
 
     def parse(self, response):
+        #TODO: check if the stock had delisted.
         fulllist = response.xpath('//div[@id="quotesearch"]/ul/li/a/text()').extract()
         items = []
 
@@ -34,14 +35,14 @@ class StockDataSpider(scrapy.Spider):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, stock=None, url_shema=None, *args, **kwargs):
+    def __init__(self, stock=None, url_template=None, *args, **kwargs):
         super(StockDataSpider, self).__init__(*args, **kwargs)
 
         self.start_urls = []
 
         if stock:
             self.stock = stock
-            self.start_urls = [url_shema %stock]
+            self.start_urls = [url_template %stock]
         else:
             self.stock = []
             import csv
@@ -49,7 +50,7 @@ class StockDataSpider(scrapy.Spider):
                 csvstr = csv.reader(f, delimiter=',')
                 for row in csvstr:
                     if re.match(r'^[036]\d+', row[0]):
-                        self.start_urls.append(url_shema %row[0])
+                        self.start_urls.append(url_template %row[0])
                         self.stock.append(row[0])
 
     @abstractmethod
@@ -64,10 +65,10 @@ class StockSectorSpider(StockDataSpider):
 
     def __init__(self, stock=None, *args, **kwargs):
 
-        url_shema = \
+        url_template = \
             "http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpOtherInfo/stockid/%s/menu_num/2.phtml"
 
-        super(StockSectorSpider, self).__init__(stock, url_shema, *args, **kwargs)
+        super(StockSectorSpider, self).__init__(stock, url_template, *args, **kwargs)
 
     def parse(self, response):
         sectortable = response.xpath('//table[@class="comInfo1"][1]/tr/td/text()').extract()
@@ -98,10 +99,10 @@ class FinancialDataSpider(StockDataSpider):
 
     def __init__(self, stock=None, *args, **kwargs):
 
-        url_shema = \
+        url_template = \
             "http://money.finance.sina.com.cn/corp/go.php/vFD_FinanceSummary/stockid/%s/displaytype/4.phtml"
 
-        super(FinancialDataSpider, self).__init__(stock, url_shema, *args, **kwargs)
+        super(FinancialDataSpider, self).__init__(stock, url_template, *args, **kwargs)
 
     def parse(self, response):
 
@@ -156,10 +157,10 @@ class HistoryPriceSpider(StockDataSpider):
     name = 'historyprice'
 
     def __init__(self, stock=None, *args, **kwargs):
-        url_shema = \
+        url_template = \
             "http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml"
 
-        super(HistoryPriceSpider, self).__init__(stock, url_shema, *args, **kwargs)
+        super(HistoryPriceSpider, self).__init__(stock, url_template, *args, **kwargs)
 
     def start_requests(self):
         for url in self.start_urls:
@@ -224,3 +225,12 @@ class TickDataSpider(CSVFeedSpider):
     """download tick data for specific day
     """
     pass
+
+# TODO:"http://www.szse.cn/szseWeb/FrontController.szse?ACTIONID=8&CATALOGID=1110&tab1PAGENUM=1&ENCODE=1&TABKEY=tab1"
+
+class DividendYieldSpider(StockDataSpider):
+    """download devidend and yields for stocks
+    """
+    pass
+
+    #TODO: http://vip.stock.finance.sina.com.cn/corp/go.php/vISSUE_ShareBonus/stockid/300144.phtml
