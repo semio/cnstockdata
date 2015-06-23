@@ -1,6 +1,6 @@
 中国股票数据下载器，使用网上免费的数据源如东方财富网，新浪财经等。
 
-看过下载回来的数据，发现有很多数据不完整，如果对数据质量有要求的还是选择一些付费的服务更好（如[预测者](http://yucezhe.com/product?name=financial-data)）
+看过下载回来的数据，发现这些免费数据有些不完整的地方（特别是财务数据），如果对数据质量有要求的还是选择一些付费的服务更好（如[预测者](http://yucezhe.com/product?name=financial-data)）
 
 ## Depandency
 
