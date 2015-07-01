@@ -33,8 +33,6 @@ class FinancialDataPipeline(object):
 
         return item
 
-
-
 def inspect_value(s):
     if u'万' in s:
         strval = re.match(u'(.*)万元', s).groups()[0]

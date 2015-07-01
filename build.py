@@ -79,3 +79,8 @@ def get_prices():
             print '[%s]: start downloading stock %s %s' %(datetime.today(), name, stock)
             cmd.crawl('historyprice', '-a', 'stock=%s' %stock, '-o', './data/prices/%s.csv' %stock)
             print '[%s]: done downloading stock %s %s' %(datetime.today(), name, stock)
+
+@task()
+def get_prices_mongo():
+    '''save downloaded prices data into mongo db'''
+    pass

@@ -34,6 +34,14 @@ class FinancialData(scrapy.Item):
     fees,\
     net_profit = [scrapy.Field()] * 11
 
+class FinancialData2(scrapy.Item):
+    '''financial data item for singal term, may replace the financial data above'''
+    code = scrapy.Field()
+    date = scrapy.Field()
+    rtype = scrapy.Field()
+    season = scrapy.Field()
+    value = scrapy.Field()
+
 class StockSectors(scrapy.Item):
     '''stock code and sectors'''
     code = scrapy.Field()
@@ -45,8 +53,3 @@ class DailyPrices(scrapy.Item):
     date = scrapy.Field()
     code, openp, highp, closep, lowp = [scrapy.Field()] * 5
     volume, yuanvolume, pmultiplier = [scrapy.Field()] * 3
-
-
-
-
-
