@@ -27,3 +27,11 @@
 所有股票的所属行业和概念：
 
 ```scrapy crawl stocksectors -o ./data/secetors.csv```
+
+下载股票日线数据
+
+```scrapy crawl hisrotyprice -a stock=000001 -o ./data/prices/000001.csv```
+
+只下载最近几个季度的日线数据
+
+```scrapy crawl hisrotyprice -a stock=000001 -a pages=2 -o ./data/prices/000001.csv```
