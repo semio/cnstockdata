@@ -186,33 +186,50 @@ class HistoryPriceSpider(StockDataSpider):
 
     name = 'historyprice'
 
-    def __init__(self, stock=None, *args, **kwargs):
+    def __init__(self, stock=None, pages=0, *args, **kwargs):
         url_template = \
             "http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml"
 
         super(HistoryPriceSpider, self).__init__(stock, url_template, *args, **kwargs)
+        if pages:
+            self.pages = int(pages)
 
     def start_requests(self):
         for url in self.start_urls:
             return [scrapy.Request(url, callback=self.get_pages)]
 
     def get_pages(self, response):
+        current_year = response.xpath('//div[@id="con02-4"]/table[1]/tr/td/form/select[1]/option[@selected]/text()')\
+                                   .extract()[0]
+        current_sea = response.xpath('//div[@id="con02-4"]/table[1]/tr/td/form/select[2]/option[@selected]')\
+                              .xpath('@value')\
+                              .extract()[0]
         years = response.xpath('//div[@id="con02-4"]/table[1]/tr/td/form/select[1]/option/text()')\
                         .extract()
-        #years.sort()
-        for year in years:
-            if int(year) < 1990:
-                continue
-            if int(year) == datetime.today().year:
-                lsea = {0:1,
-                        1:2,
-                        2:3,
-                        3:4}.get(datetime.today().month/4)
-            else:
-                lsea = 4
-            for i in range(lsea, 0, -1):
-                url = response.url + '?year=' + year + '&jidu=' + str(i)
+        if self.pages:
+            pg = self.pages
+            sea = int(current_sea)
+            year = int(current_year)
+            while pg != 0:
+                url = response.url + '?year=' + str(year) + '&jidu=' + str(sea)
+                pg = pg - 1
+                if sea - 1 == 0:
+                    year = year - 1
+                    sea = 4
+                else: sea = sea - 1
                 yield scrapy.Request(url, callback=self.parse)
+        else:
+            #years.sort()
+            for year in years:
+                if int(year) < 1990:
+                    continue
+                if int(year) == int(current_year):
+                    lsea = int(current_sea)
+                else:
+                    lsea = 4
+                for i in range(lsea, 0, -1):
+                    url = response.url + '?year=' + year + '&jidu=' + str(i)
+                    yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
         rows = response.xpath('//table[@id="FundHoldSharesTable"]/tr')
