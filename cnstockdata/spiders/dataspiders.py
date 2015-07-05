@@ -186,13 +186,14 @@ class HistoryPriceSpider(StockDataSpider):
 
     name = 'historyprice'
 
-    def __init__(self, stock=None, pages=0, *args, **kwargs):
+    def __init__(self, stock=None, pages=None, *args, **kwargs):
         url_template = \
             "http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml"
 
         super(HistoryPriceSpider, self).__init__(stock, url_template, *args, **kwargs)
         if pages:
             self.pages = int(pages)
+        else: self.pages = 0
 
     def start_requests(self):
         for url in self.start_urls:
