@@ -5,6 +5,7 @@
 ## Depandency
 
 * scrapy
+* pynt (optional)
 
 ## 目前已经实现的功能
 
@@ -35,3 +36,7 @@
 只下载最近几个季度的日线数据
 
 ```scrapy crawl hisrotyprice -a stock=000001 -a pages=2 -o ./data/prices/000001.csv```
+
+## pynt
+
+```build.py```里面是一些pynt task。 
