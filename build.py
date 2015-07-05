@@ -81,6 +81,59 @@ def get_prices():
             print '[%s]: done downloading stock %s %s' %(datetime.today(), name, stock)
 
 @task()
+def get_prices_updates():
+    '''download stock daily prices for last 2 seasons'''
+    from pandas import read_csv
+
+    stocklist = read_csv('./data/stocklist.csv', dtype={'code':str})
+    downloadstocks = [i for i in stocklist['code'] if i.startswith(('0', '3', '6'))]
+
+    cmd = sh.Command('scrapy')
+    for stock in downloadstocks:
+        if os.path.exists('./data/prices/updates/%s.csv' %stock):
+            continue
+        else:
+            name = stocklist[stocklist['code'] == stock].name.iloc[0]
+            print '[%s]: start downloading stock %s %s' %(datetime.today(), name, stock)
+            cmd.crawl('historyprice', '-a', 'stock=%s' %stock, '-a', 'pages=2', '-o', './data/prices/updates/%s.csv' %stock)
+            print '[%s]: done downloading stock %s %s' %(datetime.today(), name, stock)
+
+@task()
 def get_prices_mongo():
-    '''save downloaded prices data into mongo db'''
-    pass
+    '''insert all downloaded prices into mongodb'''
+    import pandas as pd
+    from pymongo import MongoClient
+
+    stocklist = pd.read_csv('./data/stocklist.csv', dtype={'code':str})
+    downloadstocks = [i for i in stocklist['code'] if i.startswith(('0', '3', '6'))]
+    client = MongoClient()
+    db = client.stock
+
+    for i, stock in enumerate(downloadstocks):
+        if i % 100 == 0:
+            print 'done %d stocks' %i
+
+        try:
+            data1 = pd.read_csv('./data/prices/%s.csv' %stock)
+        except:
+            data1 = pd.DataFrame([])
+
+        try:
+            data2 = pd.read_csv('./data/prices/updates/%s.csv' %stock)
+        except:
+            data2 = pd.DataFrame([])
+
+        if data1.empty and data2.empty:
+            print 'no data for %s' %stock
+            continue
+        else:
+            df = pd.concat([data1, data2]).drop_duplicates()
+            df.date = pd.to_datetime(df.date)
+            df.sort_index(by='date', inplace=True)
+            items = df.to_dict('record')
+            for i in items:
+                i.update({'basicinfo_id': stock})
+            db.historyprice.insert_many(items)
+
+
+
