@@ -22,8 +22,7 @@ def get_stocklist():
     cmd = sh.Command("scrapy")
     cmd.crawl("stocklist", "-o", "./data/stocklist.csv")
 
-#@task('get_stocklist')
-@task()
+@task(get_stocklist)
 def get_stocklist_mongo():
     '''save the downloaded stocklist to mongodb'''
     from pymongo import MongoClient
@@ -81,7 +80,7 @@ def get_prices():
             print '[%s]: done downloading stock %s %s' %(datetime.today(), name, stock)
 
 @task()
-def get_prices_updates():
+def get_prices_updates(pages=1):
     '''download stock daily prices for last 2 seasons'''
     from pandas import read_csv
 
@@ -95,7 +94,7 @@ def get_prices_updates():
         else:
             name = stocklist[stocklist['code'] == stock].name.iloc[0]
             print '[%s]: start downloading stock %s %s' %(datetime.today(), name, stock)
-            cmd.crawl('historyprice', '-a', 'stock=%s' %stock, '-a', 'pages=2', '-o', './data/prices/updates/%s.csv' %stock)
+            cmd.crawl('historyprice', '-a', 'stock=%s' %stock, '-a', 'pages=%s' %pages, '-o', './data/prices/updates/%s.csv' %stock)
             print '[%s]: done downloading stock %s %s' %(datetime.today(), name, stock)
 
 @task()

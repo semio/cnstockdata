@@ -191,13 +191,13 @@ class HistoryPriceSpider(StockDataSpider):
             "http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml"
 
         super(HistoryPriceSpider, self).__init__(stock, url_template, *args, **kwargs)
+        #print self.start_urls[0]
         if pages:
             self.pages = int(pages)
         else: self.pages = 0
 
     def start_requests(self):
-        for url in self.start_urls:
-            return [scrapy.Request(url, callback=self.get_pages)]
+        return [scrapy.Request(url, callback=self.get_pages) for url in self.start_urls]
 
     def get_pages(self, response):
         current_year = response.xpath('//div[@id="con02-4"]/table[1]/tr/td/form/select[1]/option[@selected]/text()')\
@@ -211,6 +211,8 @@ class HistoryPriceSpider(StockDataSpider):
             pg = self.pages
             sea = int(current_sea)
             year = int(current_year)
+            if year != datetiem.today().year:
+                return
             while pg != 0:
                 url = response.url + '?year=' + str(year) + '&jidu=' + str(sea)
                 pg = pg - 1
@@ -218,6 +220,7 @@ class HistoryPriceSpider(StockDataSpider):
                     year = year - 1
                     sea = 4
                 else: sea = sea - 1
+                #print url
                 yield scrapy.Request(url, callback=self.parse)
         else:
             #years.sort()
