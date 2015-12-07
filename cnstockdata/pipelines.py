@@ -8,6 +8,10 @@
 #TODO: add support for mangodb
 
 import re
+from pandas import to_datetime
+from datetime import datetime
+from scrapy.exceptions import DropItem
+
 #from cnstockdata.items import FinancialData
 
 class FinancialDataPipeline(object):
@@ -44,3 +48,23 @@ def inspect_value(s):
         return 0
     else:
         return float(s)
+
+
+class RecentDataPipeline(object):
+    '''only return data for recent'''
+
+    def process_item(self, item, spider):
+        if spider.name == 'historyprice':
+            if spider.pages:
+                td = to_datetime(datetime.today())
+                id = to_datetime(item['date'])
+                days = (td - id).days
+
+                if not (days > spider.pages * 100):
+                    return item
+                # drop the item if the item date is too far from today
+                else:
+                    raise DropItem('Date too old')
+
+        else:
+            return item
