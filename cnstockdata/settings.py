@@ -15,11 +15,12 @@ NEWSPIDER_MODULE = 'cnstockdata.spiders'
 FEED_FORMAT = 'csv'
 
 ITEM_PIPELINES = {
-    'cnstockdata.pipelines.FinancialDataPipeline' : 300,
+    'cnstockdata.pipelines.FinancialDataPipeline': 300,
+    'cnstockdata.pipelines.RecentDataPipeline': 400
     }
 
 DOWNLOAD_DELAY = 0.5
-CONCURRENT_REQUESTS_PER_DOMAIN = 5
+CONCURRENT_REQUESTS_PER_DOMAIN = 10
 DOWNLOAD_TIMEOUT = 10
 
 LOG_LEVEL = 'INFO'
