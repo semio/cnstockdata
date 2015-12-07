@@ -43,7 +43,7 @@ class HistoryPriceSpider(StockDataSpider):
             pg = self.pages
             sea = int(current_sea)
             year = int(current_year)
-            if year != datetiem.today().year:
+            if year != datetime.today().year:
                 return
             while pg != 0:
                 url = response.url + '?year=' + str(year) + '&jidu=' + str(sea)
