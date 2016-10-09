@@ -13,6 +13,7 @@ BOT_NAME = 'cnstockdata'
 SPIDER_MODULES = ['cnstockdata.spiders']
 NEWSPIDER_MODULE = 'cnstockdata.spiders'
 FEED_FORMAT = 'csv'
+FEED_EXPORT_FIELDS = ['date', 'code', 'openp', 'highp', 'closep', 'lowp', 'volume', 'yuanvolume', 'pmultiplier']
 
 ITEM_PIPELINES = {
     'cnstockdata.pipelines.FinancialDataPipeline' : 300,
