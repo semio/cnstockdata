@@ -130,7 +130,7 @@ class IndexHistorySpider(StockDataSpider):
                 lsea = {0:1,
                         1:2,
                         2:3,
-                        3:4}.get(datetime.today().month/4)
+                        3:4}.get(int(datetime.today().month/4))
             else:
                 lsea = 4
             for i in range(lsea, 0, -1):
@@ -138,7 +138,7 @@ class IndexHistorySpider(StockDataSpider):
                 yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
-        #self.logger.info('crawling page %s' %response.url)
+        # self.logger.info('crawling page %s' %response.url)
         rows = response.xpath('//table[@id="FundHoldSharesTable"]/tr')
         items = []
 
